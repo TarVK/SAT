@@ -47,4 +47,5 @@ export const And = createOperator((...formulas: IFormula[]) => ({
                 formattedFormulas[0] || ""
             );
     },
+    toZ3: context => `(and ${formulas.map(formula => formula.toZ3(context)).join(" ")})`,
 }));

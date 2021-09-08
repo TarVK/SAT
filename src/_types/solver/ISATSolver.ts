@@ -8,5 +8,5 @@ export type ISATSolver = {
      * @param formula The formula to be solved
      * @returns Either undefined if no assignment exists, or a variable collection that satisfies the formula
      */
-    (formula: IFormula): ISolveResult;
+    (formula: IFormula): Promise<ISolveResult>;
 };

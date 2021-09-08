@@ -25,6 +25,12 @@ export type IFormulaInput<D extends Object = {}> = {
      * @returns The neatly formatted string
      */
     format(format: (subFormula: IFormula) => string, context: IContext): string;
+    /**
+     * Formats this formula into a Z3 string
+     * @param context The context to pass data with
+     * @returns A string that z3 can understand
+     */
+    toZ3(context: IContext): string;
     /** Additional data for the formula */
     data?: D;
 };

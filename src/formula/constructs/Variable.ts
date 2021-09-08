@@ -19,10 +19,11 @@ export const Variable = createOperator((variable: symbol | string) => {
                         symbolVar
                     )}" wasn't present in the passed variables`
                 );
-            return variables[symbolVar];
+            return Boolean(variables[symbolVar]);
         },
         toCNF: (context, negated) => [[{variable: symbolVar, negated}]],
         format: () => String(variable),
+        toZ3: context => `${getVariableId(variable)}`,
     };
 });
 
@@ -35,4 +36,19 @@ const variableMap: Record<string, symbol> = {};
 export function getVariableSymbol(name: string): symbol {
     if (!variableMap[name]) variableMap[name] = Symbol(name);
     return variableMap[name];
+}
+
+const variableIds: Record<symbol, number> = {};
+let maxId = 0;
+/**
+ * Obtains a uuid for the ID
+ * @param variable
+ */
+export function getVariableId(variable: string | symbol): string {
+    if (typeof variable == "string") return variable;
+
+    if (!variableIds[variable]) variableIds[variable] = maxId++;
+    const varID = "$" + variableIds[variable];
+    if (!variableMap[varID]) variableMap[varID] = variable;
+    return varID;
 }

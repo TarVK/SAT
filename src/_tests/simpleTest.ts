@@ -3,7 +3,7 @@ import {And} from "../formula/constructs/And";
 import {Not} from "../formula/constructs/Not";
 import {Or} from "../formula/constructs/Or";
 import {Variable} from "../formula/constructs/Variable";
-import {genList} from "./genList.helper";
+import {genList} from "../utils/genList";
 
 /**
  * Unsatisfiable: (and (or (and a b) (not (or b c))) (and (not c) b (not a)))

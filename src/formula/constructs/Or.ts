@@ -47,4 +47,5 @@ export const Or = createOperator((...formulas: IFormula[]) => ({
                 formattedFormulas[0] || ""
             );
     },
+    toZ3: context => `(or ${formulas.map(formula => formula.toZ3(context)).join(" ")})`,
 }));

@@ -26,7 +26,8 @@ export function createFormula<T extends IFormulaInput>(formula: T): IFormula & T
         format: (context = new Context()) => formula.format(format(context), context),
         toCNF: (context = new Context(), negate = false) =>
             formula.toCNF(context, negate),
-        solve: solver => (solver || DavisPutnamSolver)(completeFormula),
+        solve: async solver => (solver || DavisPutnamSolver)(completeFormula),
+        toZ3: (context = new Context()) => formula.toZ3(context),
     };
 
     return completeFormula;

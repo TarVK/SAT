@@ -18,17 +18,25 @@ export type IFormula = {
      */
     toCNF(context?: IContext, negate?: boolean): ICNF;
     /**
-     * Tries to solve this formula
-     * @param solver The specific solver to be used
-     * @returns The found result
-     */
-    solve(solver?: ISATSolver): ISolveResult;
-    /**
      * Formats this formula into a neatly readable string
      * @param context The context to pass data with
      * @returns The neatly formatted string
      */
     format(context?: IContext): string;
+    /**
+     * Formats this formula into a Z3 string
+     * @param context The context to pass data with
+     * @returns A string that z3 can understand
+     */
+    toZ3(context?: IContext): string;
     /** The precedence for this operator */
     precedence: number;
+
+    // Higher level functions
+    /**
+     * Tries to solve this formula
+     * @param solver The specific solver to be used
+     * @returns The found result
+     */
+    solve(solver?: ISATSolver): Promise<ISolveResult>;
 };

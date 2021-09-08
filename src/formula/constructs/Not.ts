@@ -14,4 +14,5 @@ export const Not = createOperator((formula: IFormula) => ({
     execute: context => !formula.execute(context),
     toCNF: (context, negated) => formula.toCNF(context, !negated),
     format: format => `¬${format(formula)}`,
+    toZ3: context => `(not ${formula.toZ3(context)})`,
 }));

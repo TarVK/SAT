@@ -10,12 +10,13 @@ import {
 } from "../simplifyCNFRepresentation";
 
 /**
- * Solves the satisfaction problem using Davis Putnam's procedure
+ * Solves the satisfiability problem using Davis Putnam's procedure
  * @param formula The formula to be solved
  * @returns The found assignment, or undefined if no assignment exists
  */
-export function DavisPutnamSolver(formula: IFormula): ISolveResult {
-    let remainingClauses = simplifyCNFRepresentation(formula.toCNF(new Context(), false));
+export function DavisPutnamSolver(formula: IFormula | ICNF): ISolveResult {
+    const cnf = "toCNF" in formula ? formula.toCNF() : formula;
+    let remainingClauses = simplifyCNFRepresentation(cnf);
 
     // Check if the empty clause is present from the start (in which case the formula isn't satisfiable)
     const containsEmpty = remainingClauses.some(clause => clause.length == 0);
