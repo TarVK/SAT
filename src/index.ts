@@ -1,4 +1,5 @@
 import {And} from "./formula/constructs/And";
+import {Implies} from "./formula/constructs/Implies";
 import {Not} from "./formula/constructs/Not";
 import {Or} from "./formula/constructs/Or";
 import {Variable} from "./formula/constructs/Variable";
@@ -10,11 +11,13 @@ import {IVariableCollection} from "./_types/solver/IVariableCollection";
 setupPrecedences([[Variable], [Not], [And], [Or]]);
 
 const formula = And(
-    Or(And(Variable("a"), Variable("b")), Not(Or(Variable("b"), Variable("c")))),
-    And(Not(Variable("c")), Variable("b"), Not(Variable("a")))
+    Implies(Variable("a"), Not(Variable("b"))),
+    Variable("a"),
+    Variable("b")
 );
 
-// console.log(formula.toZ3());
+formula.solve().then(console.log);
+console.log(formula.format());
 
 // Z3Solver(`\
 // ; Variable declarations

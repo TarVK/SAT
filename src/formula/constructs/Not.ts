@@ -10,7 +10,6 @@ export const Not = createOperator((formula: IFormula) => ({
     data: {
         child: formula,
     },
-    precedence: 2,
     execute: context => !formula.execute(context),
     toCNF: (context, negated) => formula.toCNF(context, !negated),
     format: format => `¬${format(formula)}`,
