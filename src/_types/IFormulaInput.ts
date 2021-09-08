@@ -2,7 +2,7 @@ import {IContext} from "./context/IContext";
 import {IFormula} from "./IFormula";
 import {ICNF} from "./solver/ICNF";
 
-export type IFormulaInput = {
+export type IFormulaInput<D extends Object = {}> = {
     /** The precedence for this operator */
     precedence?: number;
     /**
@@ -25,4 +25,6 @@ export type IFormulaInput = {
      * @returns The neatly formatted string
      */
     format(format: (subFormula: IFormula) => string, context: IContext): string;
+    /** Additional data for the formula */
+    data?: D;
 };

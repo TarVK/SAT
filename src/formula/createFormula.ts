@@ -10,9 +10,7 @@ import {IFormulaInput} from "../_types/IFormulaInput";
  * @param formula The formula object
  * @returns The formula together with some useful functions
  */
-export function createFormula<T extends IFormulaInput>(
-    formula: T
-): IFormula & Omit<T, keyof IFormulaInput> {
+export function createFormula<T extends IFormulaInput>(formula: T): IFormula & T["data"] {
     const precedence = formula.precedence ?? 0;
 
     // A format function that takes care of adding association brackets if necessary
@@ -21,8 +19,8 @@ export function createFormula<T extends IFormulaInput>(
             ? `(${formula.format(context)})`
             : formula.format(context);
 
-    const completeFormula: IFormula & Omit<T, keyof IFormulaInput> = {
-        ...formula,
+    const completeFormula: IFormula & T["data"] = {
+        ...formula.data,
         precedence,
         execute: (context = new Context()) => formula.execute(context),
         format: (context = new Context()) => formula.format(format(context), context),

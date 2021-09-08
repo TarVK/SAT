@@ -1,5 +1,4 @@
-import {IFormula} from "../../_types/IFormula";
-import {createFormula} from "../createFormula";
+import {createOperator} from "../createOperator";
 import {variablesIdentifier} from "../variablesIdentifier";
 
 /**
@@ -7,11 +6,10 @@ import {variablesIdentifier} from "../variablesIdentifier";
  * @param variable Either a unique symbol, or a string to represent the variable
  * @returns The formula representing this variable, including an identifier for this variable
  */
-export const Variable = (variable: symbol | string): IFormula & {identifier: symbol} => {
+export const Variable = createOperator((variable: symbol | string) => {
     const symbolVar =
         typeof variable == "string" ? getVariableSymbol(variable) : variable;
-    return createFormula({
-        precedence: Infinity,
+    return {
         identifier: symbolVar,
         execute: context => {
             const variables = context.get(variablesIdentifier);
@@ -25,8 +23,8 @@ export const Variable = (variable: symbol | string): IFormula & {identifier: sym
         },
         toCNF: (context, negated) => [[{variable: symbolVar, negated}]],
         format: () => String(variable),
-    });
-};
+    };
+});
 
 const variableMap: Record<string, symbol> = {};
 /**
