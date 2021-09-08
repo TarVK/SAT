@@ -9,7 +9,9 @@
         "build/**/*.{js,d.ts}"
     ],
     "scripts": {
-        "start": "tsc -w",
+        "start": "node ./build/index.js",
+        "dbg": "node --inspect-brk ./build/index.js",
+        "dev": "tsc -w ",
         "build": "tsc",
         "test": "jest -i",
         "test-watch": "jest --watch -i",

@@ -8,15 +8,9 @@ import {ISCNF} from "../_types/solver/ISCNF";
  */
 export function simplifyCNFRepresentation(formula: ICNF): ISCNF {
     const noRedundantClauses = formula.filter(clause => !clauseIsTautology(clause));
-
-    const noRedundantLiterals = noRedundantClauses.map(clause => {
-        const vars: Record<symbol, boolean> = {};
-        return clause.filter(({variable}) => {
-            if (variable in vars) return false;
-            vars[variable] = true;
-            return true;
-        });
-    });
+    const noRedundantLiterals = noRedundantClauses.map(clause =>
+        removeDuplicateVars(clause)
+    );
 
     return noRedundantLiterals;
 }
@@ -34,4 +28,18 @@ export function clauseIsTautology(clause: ICNFLiteral[]): boolean {
     }
 
     return false;
+}
+
+/**
+ * Removes duplicate variables in a given clause
+ * @param clause The clause to remove duplicate variables from
+ * @returns The literals without duplicates
+ */
+export function removeDuplicateVars(clause: ICNFLiteral[]): ICNFLiteral[] {
+    const vars: Record<symbol, boolean> = {};
+    return clause.filter(({variable}) => {
+        if (vars[variable]) return false;
+        vars[variable] = true;
+        return true;
+    });
 }

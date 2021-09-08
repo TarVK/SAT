@@ -9,6 +9,7 @@ import {createFormula} from "../createFormula";
  */
 export const And = (...formulas: IFormula[]): IFormula & {children: IFormula[]} =>
     createFormula({
+        precedence: 2,
         children: formulas,
         execute: context => formulas.every(formula => formula.execute(context)),
         toCNF: (context, negated) => {
@@ -34,5 +35,16 @@ export const And = (...formulas: IFormula[]): IFormula & {children: IFormula[]} 
                     return newResult;
                 });
             }
+        },
+        format: format => {
+            const formattedFormulas = formulas
+                .map(formula => format(formula))
+                .filter(text => text.length > 0);
+            return formattedFormulas
+                .slice(1)
+                .reduce(
+                    (result, formula) => `${result} ∧ ${formula}`,
+                    formattedFormulas[0] || ""
+                );
         },
     });

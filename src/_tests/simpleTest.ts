@@ -33,12 +33,9 @@ describe("Satisfiability checker", () => {
                 genList(n, j =>
                     genList({start: j + 1, end: n + 1}, k => Not(And(P[j][i], P[k][i])))
                 )
-            )
-                .flat()
-                .flat()
+            ).flat(2)
         );
         const PF = And(C, R);
-        // console.log(PF.toCNF(new Context(), false));
         expect(PF.solve()).toEqual(undefined);
     });
 });

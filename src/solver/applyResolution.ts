@@ -1,5 +1,6 @@
 import {ICNFLiteral} from "../_types/solver/ICNF";
 import {IVariableIdentifier} from "../_types/solver/IVariableIdentifier";
+import {removeDuplicateVars} from "./simplifyCNFRepresentation";
 
 /**
  * Combines two clauses on a given literal

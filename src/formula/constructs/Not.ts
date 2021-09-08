@@ -8,7 +8,9 @@ import {createFormula} from "../createFormula";
  */
 export const Not = (formula: IFormula): IFormula & {child: IFormula} =>
     createFormula({
+        precedence: 2,
         child: formula,
         execute: context => !formula.execute(context),
         toCNF: (context, negated) => formula.toCNF(context, !negated),
+        format: format => `¬${format(formula)}`,
     });

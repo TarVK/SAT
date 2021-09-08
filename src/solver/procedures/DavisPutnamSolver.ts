@@ -3,7 +3,11 @@ import {IFormula} from "../../_types/IFormula";
 import {ICNF} from "../../_types/solver/ICNF";
 import {ISolveResult} from "../../_types/solver/ISolveResult";
 import {applyResolution} from "../applyResolution";
-import {clauseIsTautology, simplifyCNFRepresentation} from "../simplifyCNFRepresentation";
+import {
+    clauseIsTautology,
+    removeDuplicateVars,
+    simplifyCNFRepresentation,
+} from "../simplifyCNFRepresentation";
 
 /**
  * Solves the satisfaction problem using Davis Putnam's procedure
@@ -43,7 +47,7 @@ export function DavisPutnamSolver(formula: IFormula): ISolveResult {
                 // If the clause is empty, the formula can't be satisfied
                 if (newClause.length == 0) return undefined;
 
-                remainingClauses.push(newClause);
+                remainingClauses.push(removeDuplicateVars(newClause));
             }
         }
 
