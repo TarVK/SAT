@@ -11,4 +11,4 @@ import {IVariableIdentifier} from "./IVariableIdentifier";
 export type ICNF = ICNFLiteral[][];
 
 /** A single literal in a CNF formula */
-export type ICNFLiteral = {variable: IVariableIdentifier; negated: boolean};
+export type ICNFLiteral = {variable: IVariableIdentifier<boolean>; negated: boolean};

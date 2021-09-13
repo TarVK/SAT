@@ -12,7 +12,7 @@ import {removeDuplicateVars} from "./simplifyCNFRepresentation";
 export function applyResolution(
     a: ICNFLiteral[],
     b: ICNFLiteral[],
-    variable: IVariableIdentifier
+    variable: IVariableIdentifier<any>
 ): ICNFLiteral[] {
     return a
         .filter(({variable: v}) => variable != v)

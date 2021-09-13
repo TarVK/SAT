@@ -1,54 +1,47 @@
+import {IFormula} from "../../_types/IFormula";
+import {IFormulaInput} from "../../_types/IFormulaInput";
+import {IVariableIdentifier} from "../../_types/solver/IVariableIdentifier";
+import {IVariableType} from "../../_types/solver/IVariableType";
+import {createFormula} from "../createFormula";
 import {createOperator} from "../createOperator";
-import {variablesIdentifier} from "../variablesIdentifier";
+import {VarCollection} from "../varCollection";
 
 /**
  * Creates a new variable
- * @param variable Either a unique symbol, or a string to represent the variable
+ * @param name The name of the variable
+ * @param type The type of the variable
  * @returns The formula representing this variable, including an identifier for this variable
  */
-export const Variable = createOperator((variable: symbol | string) => {
-    const symbolVar =
-        typeof variable == "string" ? getVariableSymbol(variable) : variable;
-    return {
-        identifier: symbolVar,
+export const Variable = createOperator(<T>(name: string, type: IVariableType<T>) => {
+    const This: IFormula<T> & IVariableIdentifier<T> = createFormula({
+        data: {name, type},
         execute: context => {
-            const variables = context.get(variablesIdentifier);
-            if (!(variable in variables))
-                throw new Error(
-                    `Variable "${String(
-                        symbolVar
-                    )}" wasn't present in the passed variables`
-                );
-            return Boolean(variables[symbolVar]);
+            const variables = context.get(VarCollection);
+            return variables.get(This as any as IVariableIdentifier<T>);
         },
-        toCNF: (context, negated) => [[{variable: symbolVar, negated}]],
-        format: () => String(variable),
-        toZ3: context => `${getVariableId(variable)}`,
-    };
+        toCNF: () => {
+            if (typeof type.defaultValue != "boolean")
+                throw new Error("Only boolean variables are supported so far");
+            return {cnf: [], variable: This as any as IVariableIdentifier<boolean>};
+        },
+        format: () => name,
+        toSMTLIB2: context => {
+            const variables = context.get(VarCollection);
+
+            // TODO: try to rename variables when duplicates are found
+            const duplicate = variables
+                .getDefined()
+                .find(variable => variable.name == name && variable != This);
+            if (duplicate)
+                throw Error(
+                    `Duplicate variable declaration found! A variable with the name ${name} was found`
+                );
+
+            return {
+                formula: name,
+                variables: new Set([This]),
+            };
+        },
+    });
+    return This;
 });
-
-const variableMap: Record<string, symbol> = {};
-/**
- * Creates a symbol for the given name, such that the same name results in the same variables
- * @param name The name of the variable
- * @returns The symbol for the variable
- */
-export function getVariableSymbol(name: string): symbol {
-    if (!variableMap[name]) variableMap[name] = Symbol(name);
-    return variableMap[name];
-}
-
-const variableIds: Record<symbol, number> = {};
-let maxId = 0;
-/**
- * Obtains a uuid for the ID
- * @param variable
- */
-export function getVariableId(variable: string | symbol): string {
-    if (typeof variable == "string") return variable;
-
-    if (!variableIds[variable]) variableIds[variable] = maxId++;
-    const varID = "$" + variableIds[variable];
-    if (!variableMap[varID]) variableMap[varID] = variable;
-    return varID;
-}

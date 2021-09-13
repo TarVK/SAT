@@ -1,8 +1,9 @@
-import {Context} from "../../context/Context";
+import {VarCollection} from "../../formula/varCollection";
 import {IFormula} from "../../_types/IFormula";
 import {ICNF} from "../../_types/solver/ICNF";
 import {ISolveResult} from "../../_types/solver/ISolveResult";
 import {applyResolution} from "../applyResolution";
+import {printCNF} from "../printCNF";
 import {
     clauseIsTautology,
     removeDuplicateVars,
@@ -15,7 +16,13 @@ import {
  * @returns The found assignment, or undefined if no assignment exists
  */
 export function DavisPutnamSolver(formula: IFormula | ICNF): ISolveResult {
-    const cnf = "toCNF" in formula ? formula.toCNF() : formula;
+    let cnf: ICNF;
+    if ("toCNF" in formula) {
+        const {cnf: formulaCnf, variable} = formula.toCNF();
+        cnf = [...formulaCnf, [{variable, negated: false}]];
+    } else {
+        cnf = formula;
+    }
     let remainingClauses = simplifyCNFRepresentation(cnf);
 
     // Check if the empty clause is present from the start (in which case the formula isn't satisfiable)
@@ -60,5 +67,5 @@ export function DavisPutnamSolver(formula: IFormula | ICNF): ISolveResult {
 
     // If no clauses remain, we have a conjunction over no items, which is a tautology
     // TODO: compute the actual variables
-    return {};
+    return new VarCollection();
 }

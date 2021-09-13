@@ -10,24 +10,23 @@ import {IFormulaInput} from "../_types/IFormulaInput";
  * @param formula The formula object
  * @returns The formula together with some useful functions
  */
-export function createFormula<T extends IFormulaInput>(formula: T): IFormula & T["data"] {
-    const precedence = formula.precedence ?? 0;
-
+export function createFormula<T extends IFormulaInput>(
+    formula: T
+): IFormula<T extends IFormulaInput<infer V> ? V : never> & T["data"] {
     // A format function that takes care of adding association brackets if necessary
     const format = (context: IContext) => (formula: IFormula) =>
-        formula.precedence < precedence
+        formula.precedence < completeFormula.precedence
             ? `(${formula.format(context)})`
             : formula.format(context);
 
     const completeFormula: IFormula & T["data"] = {
         ...formula.data,
-        precedence,
+        precedence: 0,
         execute: (context = new Context()) => formula.execute(context),
         format: (context = new Context()) => formula.format(format(context), context),
-        toCNF: (context = new Context(), negate = false) =>
-            formula.toCNF(context, negate),
+        toCNF: (context = new Context()) => formula.toCNF(context),
         solve: async solver => (solver || DavisPutnamSolver)(completeFormula),
-        toZ3: (context = new Context()) => formula.toZ3(context),
+        toSMTLIB2: (context = new Context()) => formula.toSMTLIB2(context),
     };
 
     return completeFormula;

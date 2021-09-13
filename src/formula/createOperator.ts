@@ -1,19 +1,21 @@
-import {IFormulaInput} from "../_types/IFormulaInput";
+import {IFormula} from "../_types/IFormula";
 import {IOperator} from "../_types/IOperator";
-import {createFormula} from "./createFormula";
 
 /**
  * Creates a new operator
  * @param behavior The base behavior of the formula
  * @returns The created operator
  */
-export function createOperator<C extends (...args: any[]) => IFormulaInput>(
+export function createOperator<C extends (...args: any[]) => IFormula>(
     behavior: C
 ): IOperator<C> {
     const This = Object.assign(
-        (...args: any) =>
-            createFormula({...behavior(...args), precedence: This.precedence}),
+        (...args: any) => {
+            const formula = behavior(...args);
+            formula.precedence = This.precedence;
+            return formula;
+        },
         {precedence: 0}
     );
-    return This;
+    return This as any;
 }

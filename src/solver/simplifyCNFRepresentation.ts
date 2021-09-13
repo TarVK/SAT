@@ -1,5 +1,6 @@
 import {ICNFLiteral, ICNF} from "../_types/solver/ICNF";
 import {ISCNF} from "../_types/solver/ISCNF";
+import {IVariableIdentifier} from "../_types/solver/IVariableIdentifier";
 
 /**
  * Simplifies the formula in CNF form
@@ -21,10 +22,11 @@ export function simplifyCNFRepresentation(formula: ICNF): ISCNF {
  * @returns Whether the given clause is a tautology
  */
 export function clauseIsTautology(clause: ICNFLiteral[]): boolean {
-    const varsNegated: Record<symbol, boolean> = {};
+    const varsNegated: Map<IVariableIdentifier<boolean>, boolean> = new Map();
     for (let {variable, negated} of clause) {
-        if (variable in varsNegated && varsNegated[variable] != negated) return true;
-        varsNegated[variable] = negated;
+        if (varsNegated.has(variable) && varsNegated.get(variable) != negated)
+            return true;
+        varsNegated.set(variable, negated);
     }
 
     return false;
@@ -36,10 +38,10 @@ export function clauseIsTautology(clause: ICNFLiteral[]): boolean {
  * @returns The literals without duplicates
  */
 export function removeDuplicateVars(clause: ICNFLiteral[]): ICNFLiteral[] {
-    const vars: Record<symbol, boolean> = {};
+    const vars: Set<IVariableIdentifier<boolean>> = new Set();
     return clause.filter(({variable}) => {
-        if (vars[variable]) return false;
-        vars[variable] = true;
+        if (vars.has(variable)) return false;
+        vars.add(variable);
         return true;
     });
 }

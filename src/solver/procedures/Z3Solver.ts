@@ -4,46 +4,47 @@ import type * as cp from "child_process";
 import type * as fs from "fs";
 import type * as path from "path";
 import {IVariableCollection} from "../../_types/solver/IVariableCollection";
-import {getVariableId, getVariableSymbol} from "../../formula/constructs/Variable";
+import {VarCollection} from "../../formula/varCollection";
 
-/**
- * Solves the satisfiability problem using the Z3 solver, only works in a node environment and if z3 is installed globally
- * @param formula The formula to be solved
- * @returns The found assignment or undefined if no assignment exists
- * @throws An error if the specified formula has problems
- */
-export async function Z3Solver(formula: IFormula | string): Promise<ISolveResult> {
-    const Z3Formula = typeof formula == "string" ? formula : formula.toZ3();
+// TODO: fix solver to work with new variables
+// /**
+//  * Solves the satisfiability problem using the Z3 solver, only works in a node environment and if z3 is installed globally
+//  * @param formula The formula to be solved
+//  * @returns The found assignment or undefined if no assignment exists
+//  * @throws An error if the specified formula has problems
+//  */
+// export async function Z3Solver(formula: IFormula | string): Promise<ISolveResult> {
+//     const Z3Formula = typeof formula == "string" ? formula : formula.toSMTLIB2();
 
-    const result = await execZ3(`${Z3Formula}
-    
-; Solve
-(check-sat)
-(get-model)`);
+//     const result = await execZ3(`${Z3Formula}
 
-    if (!result) return undefined;
+// ; Solve
+// (check-sat)
+// (get-model)`);
 
-    const variables: IVariableCollection = {};
+//     if (!result) return undefined;
 
-    // Obtain constant vars
-    const varRegex = /define-fun\s+([\w\-]+)\s+\(\)\s+(\w+)\s+(\w+)/gm;
-    const matches: RegExpMatchArray[] = [];
-    let match: RegExpMatchArray | null;
-    while ((match = varRegex.exec(result))) matches.push(match);
+//     const variables: IVariableCollection = new VarCollection();
 
-    matches.sort(([a], [b]) => (a > b ? 1 : a < b ? -1 : 0));
+//     // Obtain constant vars
+//     const varRegex = /define-fun\s+([\w\-]+)\s+\(\)\s+(\w+)\s+(\w+)/gm;
+//     const matches: RegExpMatchArray[] = [];
+//     let match: RegExpMatchArray | null;
+//     while ((match = varRegex.exec(result))) matches.push(match);
 
-    matches.forEach(([_, variable, type, value]) => {
-        const parser =
-            Z3ResultParsers[type.toLowerCase() as keyof typeof Z3ResultParsers];
-        if (!parser) throw new Error(`No output parser defined for data type ${type}`);
+//     matches.sort(([a], [b]) => (a > b ? 1 : a < b ? -1 : 0));
 
-        const parsedValue = parser(value);
-        variables[getVariableSymbol(variable)] = parsedValue;
-    });
+//     matches.forEach(([_, variable, type, value]) => {
+//         const parser =
+//             Z3ResultParsers[type.toLowerCase() as keyof typeof Z3ResultParsers];
+//         if (!parser) throw new Error(`No output parser defined for data type ${type}`);
 
-    return variables;
-}
+//         const parsedValue = parser(value);
+//         variables.set(variable, parsedValue);
+//     });
+
+//     return variables;
+// }
 
 /**
  * Solves the satisfiability problem using the Z3 solver, only works in a node environment and if z3 is installed globally
