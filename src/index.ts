@@ -1,4 +1,5 @@
 import {And} from "./formula/constructs/And";
+import {BiImplies} from "./formula/constructs/BiImplies";
 import {Implies} from "./formula/constructs/Implies";
 import {Not} from "./formula/constructs/Not";
 import {Or} from "./formula/constructs/Or";
@@ -8,7 +9,7 @@ import {Z3Solver} from "./solver/procedures/Z3Solver";
 import {genList} from "./utils/genList";
 import {IVariableCollection} from "./_types/solver/IVariableCollection";
 
-setupPrecedences([[Variable], [Not], [And], [Or]]);
+setupPrecedences([[Variable], [Not], [And], [Or], [Implies, BiImplies]]);
 
 const formula = And(
     Implies(Variable("a"), Not(Variable("b"))),
