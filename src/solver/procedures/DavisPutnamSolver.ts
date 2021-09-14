@@ -3,7 +3,6 @@ import {IFormula} from "../../_types/IFormula";
 import {ICNF} from "../../_types/solver/ICNF";
 import {ISolveResult} from "../../_types/solver/ISolveResult";
 import {applyResolution} from "../applyResolution";
-import {printCNF} from "../printCNF";
 import {
     clauseIsTautology,
     removeDuplicateVars,
@@ -15,7 +14,7 @@ import {
  * @param formula The formula to be solved
  * @returns The found assignment, or undefined if no assignment exists
  */
-export function DavisPutnamSolver(formula: IFormula | ICNF): ISolveResult {
+export async function DavisPutnamSolver(formula: IFormula | ICNF): Promise<ISolveResult> {
     let cnf: ICNF;
     if ("toCNF" in formula) {
         const {cnf: formulaCnf, variable} = formula.toCNF();

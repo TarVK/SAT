@@ -1,5 +1,5 @@
 import {Context} from "../context/Context";
-import {DavisPutnamSolver} from "../solver/procedures/DavisPutnamSolver";
+import {DPLLSolver} from "../solver/procedures/DPLLSolver";
 import {IContext} from "../_types/context/IContext";
 import {IFormula} from "../_types/IFormula";
 import {IFormulaInput} from "../_types/IFormulaInput";
@@ -25,7 +25,7 @@ export function createFormula<T extends IFormulaInput>(
         execute: (context = new Context()) => formula.execute(context),
         format: (context = new Context()) => formula.format(format(context), context),
         toCNF: (context = new Context()) => formula.toCNF(context),
-        solve: async solver => (solver || DavisPutnamSolver)(completeFormula),
+        solve: solver => (solver || DPLLSolver)(completeFormula),
         toSMTLIB2: (context = new Context()) => formula.toSMTLIB2(context),
     };
 
