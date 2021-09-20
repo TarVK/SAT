@@ -84,6 +84,8 @@ export async function Z3SolverRaw(formula: string): Promise<undefined | IRawResu
     const iteRegex = /ite\s+\(\=\s+([^\s]+)\s+([^\)]+)\)\s+([^\n]+)/gm;
     while ((match = funcRegex.exec(result))) {
         const [_, variable, type, ite, def] = match;
+        if (variables[variable] != undefined) continue;
+
         const parser =
             Z3ResultParsers[type.toLowerCase() as keyof typeof Z3ResultParsers];
         if (!parser) throw new Error(`No output parser defined for data type ${type}`);
@@ -104,6 +106,7 @@ export async function Z3SolverRaw(formula: string): Promise<undefined | IRawResu
     const orRegex = /\=\s+([^\s]+)\s+([^)]+)/gm;
     while ((match = booleanFuncRegex.exec(result))) {
         const [_, variable, type, or] = match;
+        if (variables[variable] != undefined) continue;
 
         const options: Record<string, any> = {};
         while ((match = orRegex.exec(or))) {
@@ -146,7 +149,6 @@ export async function execZ3(formula: string): Promise<undefined | string> {
 
     // Check the result
     if (result.includes("unsat")) return undefined;
-    console.log(result);
     return result;
 }
 

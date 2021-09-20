@@ -21,6 +21,9 @@ export async function DPLLSolver(formula: IFormula | ICNF): Promise<ISolveResult
     return DPLLRec(cnf);
 }
 
+/**
+ * The base DPLL algorithm that runs on a CNF formula
+ */
 export function DPLLRec(formula: ICNF): ISolveResult {
     formula = applyUnitResolution(formula);
 
@@ -50,7 +53,3 @@ export function DPLLRec(formula: ICNF): ISolveResult {
         DPLLRec([...formula, [{variable: unassignedVariable.variable, negated: true}]])
     );
 }
-
-// type INode = {
-//     guessedBariable:
-// }

@@ -61,7 +61,7 @@ export function convertToCnf(
         isGenerated: true,
     };
 
-    // Apply this operator's constraints
+    // Apply this operator's constraints using the Tseytin transformation
     while (childVars.length > 0) {
         // Obtain the variables to use
         const vars: IVariableIdentifier<boolean>[] = [];
