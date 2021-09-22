@@ -10,6 +10,7 @@ import {Boolean} from "./formula/types/Boolean";
 import {VarCollection} from "./formula/varCollection";
 import {CDCLSolver} from "./solver/procedures/CDCL/CDCLSolver";
 import {DPLLSolver} from "./solver/procedures/DPLLSolver";
+import {getPartialPigeonHoleFormula} from "./solver/procedures/_tests/formulas.helper";
 import {genList} from "./utils/genList";
 import {IVariableCollection} from "./_types/solver/IVariableCollection";
 
@@ -24,17 +25,7 @@ const c = Variable("c", Boolean);
 // const formula = And(And(Or(a), Or(b)), And(Not(And(a, b))));
 // const formula = Implies(a, b);
 
-const n = 7;
-const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Boolean)));
-const C = And(...genList(n + 1, i => Or(...genList(n, j => P[i][j]))));
-const R = And(
-    ...genList(n, i =>
-        genList(n, j =>
-            genList({start: j + 1, end: n + 1}, k => Not(And(P[j][i], P[k][i])))
-        )
-    ).flat(2)
-);
-const formula = And(C, R);
+const formula = getPartialPigeonHoleFormula(8);
 
 // console.log(formula.format());
 

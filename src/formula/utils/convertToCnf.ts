@@ -5,7 +5,7 @@ import {IVariableIdentifier} from "../../_types/solver/IVariableIdentifier";
 import {Boolean} from "../types/Boolean";
 
 /**
- * Converts a given formula to cnf
+ * Converts a given formula to cnf using the Tseytin transformation
  * @param config The configuration of the operator
  * @param formulas The child formulas that this operator was applied on
  * @param context The context to obtain data from
