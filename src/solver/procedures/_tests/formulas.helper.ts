@@ -2,7 +2,7 @@ import {And} from "../../../formula/constructs/And";
 import {Not} from "../../../formula/constructs/Not";
 import {Or} from "../../../formula/constructs/Or";
 import {Variable} from "../../../formula/constructs/Variable";
-import {Boolean} from "../../../formula/types/Boolean";
+import {Bool} from "../../../formula/types/Bool";
 import {genList} from "../../../utils/genList";
 
 /**
@@ -11,9 +11,9 @@ import {genList} from "../../../utils/genList";
  */
 
 export function getUnSatisfiableFormula() {
-    const a = Variable("a", Boolean);
-    const b = Variable("b", Boolean);
-    const c = Variable("c", Boolean);
+    const a = Variable("a", Bool);
+    const b = Variable("b", Bool);
+    const c = Variable("c", Bool);
 
     return {
         name: "((a && b) || !(b || c)) && (!c && b && !a)",
@@ -22,9 +22,9 @@ export function getUnSatisfiableFormula() {
 }
 
 export function getSatisfiableFormula() {
-    const a = Variable("a", Boolean);
-    const b = Variable("b", Boolean);
-    const c = Variable("c", Boolean);
+    const a = Variable("a", Bool);
+    const b = Variable("b", Bool);
+    const c = Variable("c", Bool);
 
     return {
         name: "((a && b) || !(b || c)) && (!c && b)",
@@ -38,7 +38,7 @@ export function getSatisfiableFormula() {
  * @returns The formula
  */
 export function getFullPigeonHoleFormula(n: number) {
-    const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Boolean)));
+    const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Bool)));
     const C = And(...genList(n + 1, i => Or(...genList(n, j => P[i][j]))));
     const R = And(
         ...genList(n, i =>
@@ -57,7 +57,7 @@ export function getFullPigeonHoleFormula(n: number) {
  * @returns The formula
  */
 export function getPartialPigeonHoleFormula(n: number) {
-    const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Boolean)));
+    const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Bool)));
     const C = And(...genList(n + 1, i => Or(...genList(n, j => P[i][j]))));
     const R = And(
         ...genList(n, i =>

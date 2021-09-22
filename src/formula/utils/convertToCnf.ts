@@ -2,7 +2,7 @@ import {IContext} from "../../_types/context/IContext";
 import {IFormula} from "../../_types/IFormula";
 import {ICNF, ICNFLiteral} from "../../_types/solver/ICNF";
 import {IVariableIdentifier} from "../../_types/solver/IVariableIdentifier";
-import {Boolean} from "../types/Boolean";
+import {Bool} from "../types/Bool";
 
 /**
  * Converts a given formula to cnf using the Tseytin transformation
@@ -56,7 +56,7 @@ export function convertToCnf(
 
     // Keep track of the generated variable to represent this formula
     let variable: IVariableIdentifier<boolean> = {
-        type: Boolean,
+        type: Bool,
         name: `${ID++}`,
         isGenerated: true,
     };
@@ -86,7 +86,7 @@ export function convertToCnf(
             if (rightAssociative) childVars.push(variable);
             else childVars.unshift(variable);
             variable = {
-                type: Boolean,
+                type: Bool,
                 name: `${ID++}`,
                 isGenerated: true,
             };
