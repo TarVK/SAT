@@ -44,7 +44,7 @@ if (result2) console.log(result2.get(a), result2.get(b)); // true, true
 3 satisfiability solver algorithms have been implemented:
 
 -   DavisPutnam: [Wikipedia/DavisPutman](https://en.wikipedia.org/wiki/Davis%E2%80%93Putnam_algorithm)
--   DPLL: [Wikipedia/DPLL](https://en.wikipedia.org/wiki/DPLL_algorithm), [users.aalto.fi/](https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/dpll.html)
+-   DPLL: [Wikipedia/DPLL](https://en.wikipedia.org/wiki/DPLL_algorithm), [users.aalto.fi/DPLL](https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/dpll.html)
 -   CDCL: [Wikipedia/CDCL](https://en.wikipedia.org/wiki/Conflict-driven_clause_learning), [users.aalto.fi/CDCL](https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/cdcl.html), [cse442-17f.github.io/CDCL](https://cse442-17f.github.io/Conflict-Driven-Clause-Learning/)
 
 Realistically the first two shouldn't be used, since they have an exponential blowup for nearly every formula. CDCL however is relatively smart, and can be used for decently large formulas. I however haven't optimized things or applied smart heuristics to improve performance, so you still shouldn't expect amazing performance.
