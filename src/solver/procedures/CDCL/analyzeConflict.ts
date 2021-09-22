@@ -33,11 +33,12 @@ export function analyzeConflict(trail: Trail, conflict: ICNFLiteral[]): ICNFLite
     // Move the cut back as long as there isn't a single unique variable that was implied by the latest decision variable in the cut, to obtain the first UIP cut
     while (decisionVarCount > 1) {
         const lastCutVariable = cut.getLast();
-        const cause = trail.getCause(lastCutVariable)!; // Logically we know there must be a cause, since if there isn't we already reached a decision variable, and thus decisionVarCount must have been 1
+        const cause = trail.getCause(lastCutVariable)!;
+        const clause = cause.clause!; // Logically we know there must be a cause, since if there isn't we already reached a decision variable, and thus decisionVarCount must have been 1
 
         if (cause.decisionVars.has(latestDecisionVariable)) decisionVarCount--;
 
-        for (let {variable: dependant} of cause.clause) {
+        for (let {variable: dependant} of clause) {
             if (dependant == lastCutVariable) continue;
             if (cut.has(dependant)) continue;
 

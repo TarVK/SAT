@@ -18,23 +18,23 @@ setupPrecedences([[Variable], [Not], [And], [Or], [Implies, BiImplies]]);
 const a = Variable("a", Boolean);
 const b = Variable("b", Boolean);
 const c = Variable("c", Boolean);
-const formula = And(Or(And(a, b), Not(Or(b, c))), And(Not(c), b));
+// const formula = And(Or(And(a, b), Not(Or(b, c))), And(Not(c), b));
 // const formula = And(Implies(a, Not(b)), a, b);
 // TODO: fix when too few params are supplied
 // const formula = And(And(Or(a), Or(b)), And(Not(And(a, b))));
 // const formula = Implies(a, b);
 
-// const n = 3;
-// const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Boolean)));
-// const C = And(...genList(n + 1, i => Or(...genList(n, j => P[i][j]))));
-// const R = And(
-//     ...genList(n, i =>
-//         genList(n, j =>
-//             genList({start: j + 1, end: n + 1}, k => Not(And(P[j][i], P[k][i])))
-//         )
-//     ).flat(2)
-// );
-// const formula = And(C, R);
+const n = 7;
+const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Boolean)));
+const C = And(...genList(n + 1, i => Or(...genList(n, j => P[i][j]))));
+const R = And(
+    ...genList(n, i =>
+        genList(n, j =>
+            genList({start: j + 1, end: n + 1}, k => Not(And(P[j][i], P[k][i])))
+        )
+    ).flat(2)
+);
+const formula = And(C, R);
 
 // console.log(formula.format());
 

@@ -23,9 +23,8 @@ describe("Satisfiability checker", () => {
         expect(await formula.solve()).not.toEqual(undefined);
     });
 
-    // Seems like the DavisPutnamSolver takes exponential time for the pigeon hole formula, runs out of memory for n > 1
     it("Should find that the pigeon hole formula isn't satisfiable", async () => {
-        const n = 1;
+        const n = 2; // Keep n small, since it's exponential
         const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Boolean)));
         const C = And(...genList(n + 1, i => Or(...genList(n, j => P[i][j]))));
         const R = And(

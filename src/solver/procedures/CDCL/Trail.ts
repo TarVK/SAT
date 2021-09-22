@@ -49,24 +49,22 @@ export class Trail {
     /**
      * Retrieves a clause from which the variable was implied, if it wasn't a decision variable
      * @param variable The variable to retrieve the causal clause for
-     * @returns Either the clause from which the value was implied and all decision variables that were responsible, or undefined
+     * @returns The decision variables that are responsible for the truthiness (a decision variable includes itself in the decision variables), and the clause the value got derived from if the variable isn't a decision variable, or undefined if the trail doesn't contain the variable
      */
     public getCause(variable: IVariableIdentifier<boolean>):
         | {
               /** The clause from which the passed variable was derived */
-              clause: ICNFLiteral[];
+              clause?: ICNFLiteral[];
               /** All the decision variables that lead up to this derivation (were required for it) */
               decisionVars: Set<IVariableIdentifier<boolean>>;
           }
         | undefined {
         const varData = this.currentVars.get(variable);
-        if (varData?.clause) {
+        if (varData)
             return {
                 clause: varData.clause,
                 decisionVars: varData.decisionVars,
             };
-        }
-        return undefined;
     }
 
     /**
@@ -124,7 +122,7 @@ export class Trail {
     public jumpTo(clause: ICNFLiteral[]): void {
         const variableIndices = clause
             .map(({variable}) => this.getIndex(variable))
-            .sort();
+            .sort((a, b) => a - b);
 
         // Get the second highest index, since as long as that variable is part of the trail, the clause is a unit clause
         const secondLastIndex = variableIndices[variableIndices.length - 2] ?? 0;
@@ -160,16 +158,16 @@ export class Trail {
     }
 
     /**
-     * Checks whether the value of teh given variable relies on any decision variable
-     * @param variable The variable to be checked
-     * @returns Whether currently a decision was required to derive the value of the variable
+     * Returns the current state of the trail in string form
      */
-    public reliesOnDecisionVariable(variable: IVariableIdentifier<boolean>): boolean {
-        if (!this.has(variable)) return true;
-
-        const firstDecision = this.decisionTrail[0];
-        const firstDecisionIndex = this.getIndex(firstDecision);
-        const variableIndex = this.getIndex(variable);
-        return variableIndex >= firstDecisionIndex;
+    public toString(): string {
+        return this.trail
+            .map(
+                variable =>
+                    `${this.getCause(variable)?.clause ? "" : " >"}${
+                        this.get(variable) ? "" : "!"
+                    }${variable.name}`
+            )
+            .join(",");
     }
 }
