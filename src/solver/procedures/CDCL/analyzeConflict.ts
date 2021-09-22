@@ -21,13 +21,14 @@ export function analyzeConflict(trail: Trail, conflict: ICNFLiteral[]): ICNFLite
         );
 
     // Keep track of how many variables in the cut were derived from the latest decision variable
-    let decisionVarCount = conflict.reduce(
+    const initialDecisionVariableCount = conflict.reduce(
         (count, {variable}) =>
             trail.getCause(variable)?.decisionVars.has(latestDecisionVariable)
                 ? count + 1
                 : count,
         0
     );
+    let decisionVarCount = initialDecisionVariableCount;
 
     // Move the cut back as long as there isn't a single unique variable that was implied by the latest decision variable in the cut, to obtain the first UIP cut
     while (decisionVarCount > 1) {
@@ -44,6 +45,8 @@ export function analyzeConflict(trail: Trail, conflict: ICNFLiteral[]): ICNFLite
             if (trail.getCause(dependant)?.decisionVars.has(latestDecisionVariable))
                 decisionVarCount++;
         }
+
+        cut.remove(lastCutVariable);
     }
 
     // Given the first UIP cut, formulate a new CNF literal to prevent the encountered contradiction

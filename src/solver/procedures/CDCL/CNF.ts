@@ -1,5 +1,6 @@
 import {ICNF, ICNFLiteral} from "../../../_types/solver/ICNF";
 import {IVariableIdentifier} from "../../../_types/solver/IVariableIdentifier";
+import {printCNF} from "../../printCNF";
 
 export class CNF {
     protected cnf: ICNF;
@@ -96,7 +97,11 @@ export class CNF {
      * @param clause The clause to be added
      */
     public addClause(clause: ICNFLiteral[]): void {
-        if (!this.cnf.includes(clause)) return;
+        // TODO: make this check disableable, it should never occur if the algorithm behaves as intended
+        if (this.hasClause(clause))
+            throw new Error(
+                `Tried to add a clause that's already present: ${printCNF([clause])}`
+            );
 
         this.cnf.push(clause);
         clause.forEach(({variable, negated}) => {
@@ -114,7 +119,8 @@ export class CNF {
      * @param clauses The clause to be added
      */
     public addClauses(...clauses: ICNFLiteral[][]): void {
-        clauses = clauses.filter(clause => !this.cnf.includes(clause));
+        // TODO: make this check disableable, it should never occur if the algorithm behaves as intended
+        clauses = clauses.filter(clause => !this.hasClause(clause));
 
         this.cnf.push(...clauses);
         clauses.forEach(clause => {
@@ -127,5 +133,27 @@ export class CNF {
                 list.push(clause);
             });
         });
+    }
+
+    /**
+     * Checks whether this cnf already contain a given clause
+     * @param clause The clause to check
+     * @returns Whether the cnf contains the clause
+     */
+    protected hasClause(clause: ICNFLiteral[]): boolean {
+        const clausesWithFirstLiteral = this.clauses.get(clause[0].variable)?.[
+            clause[0].negated ? 1 : 0
+        ];
+        if (!clausesWithFirstLiteral) return false;
+
+        const sameLengthClauses = clausesWithFirstLiteral.filter(
+            c => c.length == clause.length
+        );
+        const hasClause = sameLengthClauses.some(c =>
+            clause.every(({variable: v1, negated: n1}) =>
+                c.find(({variable: v2, negated: n2}) => v1 == v2 && n1 == n2)
+            )
+        );
+        return hasClause;
     }
 }

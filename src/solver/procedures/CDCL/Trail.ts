@@ -2,14 +2,31 @@ import {ICNFLiteral} from "../../../_types/solver/ICNF";
 import {IVariableIdentifier} from "../../../_types/solver/IVariableIdentifier";
 
 export class Trail {
-    protected trail: {
-        /** The variable itself */
-        variable: IVariableIdentifier<boolean>;
-        /** The clause that caused this variable to be true, or undefined if this is a decision variable */
-        clause?: ICNFLiteral[];
-    }[] = [];
+    protected trail: IVariableIdentifier<boolean>[] = [];
+    protected decisionTrail: IVariableIdentifier<boolean>[] = []; // Trail that only includes decision variable
 
-    protected currentVars: Map<IVariableIdentifier<boolean>, boolean> = new Map();
+    protected currentVars: Map<
+        IVariableIdentifier<boolean>,
+        {
+            /** The current value that the variable has within this trail */
+            value: boolean;
+            /** The clause that this variable got inferred from, if any */
+            clause?: ICNFLiteral[];
+            /** All the decision variables that lead up to this derivation (were required for it), includes itself if this is a decision variable */
+            decisionVars: Set<IVariableIdentifier<boolean>>;
+            /** The index that this variable has within the trail */
+            index: number;
+        }
+    > = new Map();
+    protected availableVars: Set<IVariableIdentifier<boolean>>;
+
+    /**
+     * Creates a new trail that should eventually contain all the specified variables
+     * @param variables THe variables
+     */
+    public constructor(variables: Set<IVariableIdentifier<boolean>>) {
+        this.availableVars = new Set(variables);
+    }
 
     /**
      * Checks whether the trail has an assignment for the specified variable
@@ -17,7 +34,7 @@ export class Trail {
      * @return sWhether the trail has an assignment for the variable
      */
     public has(variable: IVariableIdentifier<boolean>): boolean {
-        // TODO:
+        return this.currentVars.has(variable);
     }
 
     /**
@@ -26,7 +43,7 @@ export class Trail {
      * @return Either the assignment of the variable if this.has(variable), or false otherwise
      */
     public get(variable: IVariableIdentifier<boolean>): boolean {
-        // TODO:
+        return this.currentVars.get(variable)?.value ?? false;
     }
 
     /**
@@ -40,11 +57,16 @@ export class Trail {
               clause: ICNFLiteral[];
               /** All the decision variables that lead up to this derivation (were required for it) */
               decisionVars: Set<IVariableIdentifier<boolean>>;
-              //   /** The latest variable that got assigned in the clause before deriving the passed variable */
-              //   latestClauseVariable: ICNFLiteral;
           }
         | undefined {
-        // TODO:
+        const varData = this.currentVars.get(variable);
+        if (varData?.clause) {
+            return {
+                clause: varData.clause,
+                decisionVars: varData.decisionVars,
+            };
+        }
+        return undefined;
     }
 
     /**
@@ -53,7 +75,7 @@ export class Trail {
      * @returns The index that the variable has if it's in the trail, or -1 otherwise
      */
     public getIndex(variable: IVariableIdentifier<boolean>): number {
-        // TODO:
+        return this.currentVars.get(variable)?.index ?? -1;
     }
 
     /**
@@ -67,7 +89,23 @@ export class Trail {
         value: boolean,
         clause?: ICNFLiteral[]
     ): void {
-        // TODO:
+        const index = this.trail.length;
+        this.trail.push(variable);
+
+        let decisionVars: Set<IVariableIdentifier<boolean>>;
+        if (clause) {
+            decisionVars = new Set(
+                clause.flatMap(({variable}) => [
+                    ...(this.currentVars.get(variable)?.decisionVars ?? []),
+                ])
+            );
+        } else {
+            decisionVars = new Set([variable]);
+            this.decisionTrail.push(variable);
+        }
+
+        this.availableVars.delete(variable);
+        this.currentVars.set(variable, {value, index, clause, decisionVars});
     }
 
     /**
@@ -75,6 +113,63 @@ export class Trail {
      * @returns Either the latest decision variable, or undefined if there's no such variable
      */
     public getLatestDecisionVariable(): IVariableIdentifier<boolean> | undefined {
-        // TODO:
+        return this.decisionTrail[this.decisionTrail.length - 1];
+    }
+
+    /**
+     * Jumps back to the highest decision level where the given clause is still a unit clause
+     * @param clause The clause that should remain a unit clause while jumping back
+     * @remark I found the precise definition of how to perform the jump at the end of chapter 3.2 of this paper: https://www21.in.tum.de/teaching/sar/SS20/1.pdf (though it's quite logical in hindsight)
+     */
+    public jumpTo(clause: ICNFLiteral[]): void {
+        const variableIndices = clause
+            .map(({variable}) => this.getIndex(variable))
+            .sort();
+
+        // Get the second highest index, since as long as that variable is part of the trail, the clause is a unit clause
+        const secondLastIndex = variableIndices[variableIndices.length - 2] ?? 0;
+
+        // Drop all decision variables that occur after the second last index
+        let latestDecision: IVariableIdentifier<boolean> | undefined;
+        while (
+            (latestDecision = this.getLatestDecisionVariable()) &&
+            this.getIndex(latestDecision) > secondLastIndex
+        ) {
+            // Drop all variables until we reach the latest at the end of trail until we hit latest decision
+            let droppedDecision = false;
+            while (!droppedDecision) {
+                const top = this.trail.pop()!;
+
+                // Properly dispose of the variable
+                this.currentVars.delete(top);
+                this.availableVars.add(top);
+                if (this.decisionTrail[this.decisionTrail.length - 1] == top)
+                    this.decisionTrail.pop();
+
+                droppedDecision = top == latestDecision;
+            }
+        }
+    }
+
+    /**
+     * Retrieves all variables that haven't been assigned in the trail yet
+     * @returns A set of the currently free variables
+     */
+    public getFreeVariables(): Set<IVariableIdentifier<boolean>> {
+        return this.availableVars;
+    }
+
+    /**
+     * Checks whether the value of teh given variable relies on any decision variable
+     * @param variable The variable to be checked
+     * @returns Whether currently a decision was required to derive the value of the variable
+     */
+    public reliesOnDecisionVariable(variable: IVariableIdentifier<boolean>): boolean {
+        if (!this.has(variable)) return true;
+
+        const firstDecision = this.decisionTrail[0];
+        const firstDecisionIndex = this.getIndex(firstDecision);
+        const variableIndex = this.getIndex(variable);
+        return variableIndex >= firstDecisionIndex;
     }
 }

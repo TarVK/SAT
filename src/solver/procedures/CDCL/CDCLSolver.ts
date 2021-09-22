@@ -1,10 +1,10 @@
+import {VarCollection} from "../../../formula/varCollection";
 import {IFormula} from "../../../_types/IFormula";
 import {ICNF} from "../../../_types/solver/ICNF";
 import {ISolveResult} from "../../../_types/solver/ISolveResult";
 import {simplifyCNFRepresentation} from "../../simplifyCNFRepresentation";
 import {analyzeConflict} from "./analyzeConflict";
 import {CNF} from "./CNF";
-import {getFirstDecisionVar} from "./getFirstDecisionVar";
 import {Trail} from "./Trail";
 import {unitPropagate} from "./unitPropagate";
 
@@ -28,7 +28,10 @@ export async function CDCLSolver(formula: IFormula | ICNF): Promise<ISolveResult
     }
 
     // Create the trail and CNF variables to operate on
-    const trail = new Trail();
+    const variables = new Set([
+        ...rawCnf.flatMap(clause => clause.map(({variable}) => variable)),
+    ]);
+    const trail = new Trail(variables);
     const cnf = new CNF(simplifyCNFRepresentation(rawCnf));
 
     // Perform an initial unit resolution without propagation
@@ -52,12 +55,25 @@ export async function CDCLSolver(formula: IFormula | ICNF): Promise<ISolveResult
 
             const newClause = analyzeConflict(trail, conflict);
             cnf.addClause(newClause);
+            trail.jumpTo(newClause);
 
-            const firstDecisionVar = getFirstDecisionVar(
-                newClause.map(({variable}) => variable),
-                trail
-            );
+            prevChangesToPropagate = [newClause[0].variable];
         } else {
+            const freeVariables = trail.getFreeVariables();
+            const decisionVariable = freeVariables.values().next().value; // Simply retrieve the first free variable, may do something smarter later
+
+            // If no decision variable could be found anymore, we reached a valid assignment without contradictions
+            if (!decisionVariable) break;
+
+            // TODO: use some heuristic to decide the value to attempt
+            trail.set(decisionVariable, false);
+
+            prevChangesToPropagate = [decisionVariable];
         }
     }
+
+    // Obtain all variables from the trail
+    const varCollection = new VarCollection();
+    for (let variable of variables) varCollection.set(variable, trail.get(variable));
+    return varCollection;
 }

@@ -8,7 +8,7 @@ import {Variable} from "./formula/constructs/Variable";
 import {setupPrecedences} from "./formula/setupPrecedences";
 import {Boolean} from "./formula/types/Boolean";
 import {VarCollection} from "./formula/varCollection";
-import {CDCLSolver} from "./solver/procedures/CDCLSolver";
+import {CDCLSolver} from "./solver/procedures/CDCL/CDCLSolver";
 import {DPLLSolver} from "./solver/procedures/DPLLSolver";
 import {genList} from "./utils/genList";
 import {IVariableCollection} from "./_types/solver/IVariableCollection";
@@ -24,7 +24,7 @@ const formula = And(Or(And(a, b), Not(Or(b, c))), And(Not(c), b));
 // const formula = And(And(Or(a), Or(b)), And(Not(And(a, b))));
 // const formula = Implies(a, b);
 
-// const n = 4;
+// const n = 3;
 // const P = genList(n + 1, i => genList(n, j => Variable(`${i}-${j}`, Boolean)));
 // const C = And(...genList(n + 1, i => Or(...genList(n, j => P[i][j]))));
 // const R = And(
