@@ -1,11 +1,10 @@
 import {IContext} from "./context/IContext";
-import {IFormula} from "./IFormula";
 import {ICNF} from "./solver/ICNF";
 import {IVariableIdentifier} from "./solver/IVariableIdentifier";
 
 export type IFormulaInput<T = any, D extends Object = {}> = {
     /** The precedence for this operator */
-    precedence?: number;
+    precedence: number;
     /**
      * Executes the formula given the collection of variables
      * @param context The context to retrieve variables from, etc
@@ -20,11 +19,10 @@ export type IFormulaInput<T = any, D extends Object = {}> = {
     toCNF(context: IContext): {cnf: ICNF; variable: IVariableIdentifier<boolean>};
     /**
      * Formats this formula into a neatly readable string
-     * @param format The function that can be used to format a subformula, which automatically inserts brackets if necessary
      * @param context The context to pass data with
      * @returns The neatly formatted string
      */
-    format(format: (subFormula: IFormula) => string, context: IContext): string;
+    format(context: IContext): string;
     /**
      * Formats this formula into a SMT-LIB2 string with accompanying variable declarations
      * @param context The context to pass data with

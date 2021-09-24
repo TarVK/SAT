@@ -9,7 +9,7 @@ import {Bool} from "../types/Bool";
  * @param config The configuration of the operator
  * @param formulas The child formulas that this operator was applied on
  * @param context The context to obtain data from
- * @returns The function that converts to CNF, given a context
+ * @returns The CNF formatted version of the formula
  */
 export function convertToCnf(
     {
@@ -37,7 +37,7 @@ export function convertToCnf(
         /** Whether the operator is right associative */
         rightAssociative?: boolean;
     },
-    formulas: IFormula[],
+    formulas: IFormula<boolean>[],
     context: IContext
 ): {cnf: ICNF; variable: IVariableIdentifier<boolean>} {
     // Make sure we have the right number of children
@@ -97,3 +97,36 @@ export function convertToCnf(
 }
 
 let ID = 0;
+
+/**
+ * Creates a converter for a given formula using the Tseytin transformation
+ * @param config The configuration of the operator
+ * @param formulas The child formulas that this operator was applied on
+ * @returns The function that converts to CNF, given a context
+ */
+export const createCNFConverter =
+    (
+        config: {
+            /** The name of the operator */
+            name: string;
+            /** The number of arguments used by the operator */
+            arity: number;
+            /**
+             * The truthTable for the operator, where binary counting is used for indexing. E.g. or:
+             * ```
+             * [
+             *   false, // false || false
+             *   true, // false || true
+             *   true, // true || false
+             *   true, // true || true
+             * ]
+             * ```
+             */
+            truthTable: boolean[];
+            /** Whether the operator is right associative */
+            rightAssociative?: boolean;
+        },
+        formulas: IFormula<boolean>[]
+    ) =>
+    (context: IContext) =>
+        convertToCnf(config, formulas, context);

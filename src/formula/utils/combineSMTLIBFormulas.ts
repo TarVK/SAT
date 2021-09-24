@@ -4,19 +4,28 @@ import {IVariableIdentifier} from "../../_types/solver/IVariableIdentifier";
 
 /**
  * Combines the given formulas using the combine function
- * @param combine The function that specifies how to combine the given formulas
- * @param formulas The formulas to be combined
- * @param context The context to specify additional data
+ * @param config The configuration of what to combine
  * @returns The combine formulas
  */
-export function combineSMTLIBFormulas(
+export function combineSMTLIBFormulas({
+    combine,
+    formulas,
+    context,
+}: {
+    /**
+     * Combines a list of string formulas together
+     * @param formulas The formulas to be combined
+     * @returns The new formula, and possibly additional variables
+     */
     combine: (formulas: string[]) => {
         formula: string;
         variables?: IVariableIdentifier<any>[];
-    },
-    formulas: IFormula[],
-    context: IContext
-): {formula: string; variables: Set<IVariableIdentifier<any>>} {
+    };
+    /** The formulas to be combined */
+    formulas: IFormula[];
+    /** The context to specify additional data */
+    context: IContext;
+}): {formula: string; variables: Set<IVariableIdentifier<any>>} {
     const childData = formulas.map(formula => formula.toSMTLIB2(context));
     const childFormulas = childData.map(({formula}) => formula);
     const childVariables = childData.map(({variables}) => variables);
@@ -29,3 +38,30 @@ export function combineSMTLIBFormulas(
 
     return {formula, variables: allVariables};
 }
+
+/**
+ * Creates a simple combiner that given a context combines the passed subformulas together as well as the used variables
+ * @param config The configuration for the combiner
+ * @returns A function that can be used to combine the formulas
+ */
+export const createSMTLIBFormulaCombiner =
+    ({
+        combine,
+        formulas,
+    }: {
+        /**
+         * Combines a list of string formulas together
+         * @param formulas The formulas to be combined
+         * @returns The new formula, and possibly additional variables
+         */
+        combine: (formulas: string[]) => {
+            formula: string;
+            variables?: IVariableIdentifier<any>[];
+        };
+        /**
+         * The formulas to be combined
+         */
+        formulas: IFormula[];
+    }) =>
+    (context: IContext) =>
+        combineSMTLIBFormulas({combine, formulas, context});

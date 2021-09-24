@@ -1,7 +1,4 @@
-import {And} from "../../../formula/constructs/And";
-import {Not} from "../../../formula/constructs/Not";
-import {Or} from "../../../formula/constructs/Or";
-import {Variable} from "../../../formula/constructs/Variable";
+import {And, Not, Or, Variable} from "../../../formula/defaultLanguage";
 import {Bool} from "../../../formula/types/Bool";
 import {genList} from "../../../utils/genList";
 

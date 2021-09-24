@@ -1,22 +1,24 @@
 import {IFormula} from "../../_types/IFormula";
-import {convertToCnf} from "../utils/convertToCnf";
+import {createCNFConverter} from "../utils/convertToCnf";
 import {createFormula} from "../createFormula";
-import {createOperator} from "../createOperator";
-import {combineSMTLIBFormulas} from "../utils/combineSMTLIBFormulas";
+import {createSMTLIBFormulaCombiner} from "../utils/combineSMTLIBFormulas";
+import {createFormatter} from "../utils/format";
+import {OperatorParser} from "../parsing/OperatorParser";
+import {createOperatorFactory} from "../createOperatorFactory";
 
-/**
- * Creates a new formula by getting the conjunction of the given formulas
- * @param formulas The formulas to be conjuncted
- * @returns The formula representing the conjunction of the given formulas
- */
-export const And = createOperator((...formulas: IFormula[]) =>
-    createFormula({
-        data: {
-            children: formulas,
-        },
-        execute: context => formulas.every(formula => formula.execute(context)),
-        toCNF: context =>
-            convertToCnf(
+/** A factory to create AND operators, with different precedences and sub-parsers */
+export const AndFactory = createOperatorFactory(({precedence}) => {
+    /**
+     * Creates a new formula by getting the conjunction of the given formulas
+     * @param formulas The formulas to be conjuncted
+     * @returns The formula representing the conjunction of the given formulas
+     */
+    const operator = (...formulas: IFormula<boolean>[]) =>
+        createFormula({
+            data: {children: formulas},
+            precedence,
+            execute: context => formulas.every(formula => formula.execute(context)),
+            toCNF: createCNFConverter(
                 {
                     name: "And",
                     arity: 2,
@@ -27,25 +29,22 @@ export const And = createOperator((...formulas: IFormula[]) =>
                         true, // true && true
                     ],
                 },
-                formulas,
-                context
+                formulas
             ),
-        format: format => {
-            const formattedFormulas = formulas
-                .map(formula => format(formula))
-                .filter(text => text.length > 0);
-            return formattedFormulas
-                .slice(1)
-                .reduce(
-                    (result, formula) => `${result} ∧ ${formula}`,
-                    formattedFormulas[0] || ""
-                );
-        },
-        toSMTLIB2: context =>
-            combineSMTLIBFormulas(
-                SMTformulas => ({formula: `(and ${SMTformulas.join(" ")})`}),
+            format: createFormatter({
                 formulas,
-                context
-            ),
-    })
-);
+                precedence,
+                combine: (left, right) => `${left} && ${right}`,
+            }),
+            toSMTLIB2: createSMTLIBFormulaCombiner({
+                combine: SMTformulas => ({formula: `(and ${SMTformulas.join(" ")})`}),
+                formulas,
+            }),
+        });
+
+    return {
+        operator,
+        associativity: "left",
+        infixParser: OperatorParser("&&").map(() => operator),
+    };
+});

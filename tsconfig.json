@@ -13,7 +13,8 @@
         "allowSyntheticDefaultImports": true,
         "preserveSymlinks": true,
         "skipLibCheck": true,
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "esModuleInterop": true
     },
     "types": ["node"],
     "exclude": ["node_modules", "**/node_modules/*", "build", "demo", "examples"]

@@ -1,23 +1,24 @@
-import {clauseIsTautology} from "../../solver/simplifyCNFRepresentation";
 import {IFormula} from "../../_types/IFormula";
 import {createFormula} from "../createFormula";
-import {createOperator} from "../createOperator";
-import {combineSMTLIBFormulas} from "../utils/combineSMTLIBFormulas";
-import {convertToCnf} from "../utils/convertToCnf";
+import {createOperatorFactory} from "../createOperatorFactory";
+import {OperatorParser} from "../parsing/OperatorParser";
+import {createSMTLIBFormulaCombiner} from "../utils/combineSMTLIBFormulas";
+import {createCNFConverter} from "../utils/convertToCnf";
+import {createFormatter} from "../utils/format";
 
-/**
- * Creates a new formula by getting the disjunction of the given formulas
- * @param formulas The formulas to be disjuncted
- * @returns The formula representing the disjunction of the given formulas
- */
-export const Or = createOperator((...formulas: IFormula[]) =>
-    createFormula({
-        data: {
-            children: formulas,
-        },
-        execute: context => formulas.some(formula => formula.execute(context)),
-        toCNF: context =>
-            convertToCnf(
+/** A factory to create OR operators, with different precedences and sub-parsers */
+export const OrFactory = createOperatorFactory(({precedence}) => {
+    /**
+     * Creates a new formula by getting the disjunction of the given formulas
+     * @param formulas The formulas to be disjuncted
+     * @returns The formula representing the disjunction of the given formulas
+     */
+    const operator = (...formulas: IFormula[]) =>
+        createFormula({
+            data: {children: formulas},
+            precedence,
+            execute: context => formulas.some(formula => formula.execute(context)),
+            toCNF: createCNFConverter(
                 {
                     name: "Or",
                     arity: 2,
@@ -28,25 +29,22 @@ export const Or = createOperator((...formulas: IFormula[]) =>
                         true, // true && true
                     ],
                 },
-                formulas,
-                context
+                formulas
             ),
-        format: format => {
-            const formattedFormulas = formulas
-                .map(formula => format(formula))
-                .filter(text => text.length > 0);
-            return formattedFormulas
-                .slice(1)
-                .reduce(
-                    (result, formula) => `${result} ∨ ${formula}`,
-                    formattedFormulas[0] || ""
-                );
-        },
-        toSMTLIB2: context =>
-            combineSMTLIBFormulas(
-                SMTformulas => ({formula: `(or ${SMTformulas.join(" ")})`}),
+            format: createFormatter({
                 formulas,
-                context
-            ),
-    })
-);
+                precedence,
+                combine: (left, right) => `${left} || ${right}`,
+            }),
+            toSMTLIB2: createSMTLIBFormulaCombiner({
+                combine: SMTformulas => ({formula: `(or ${SMTformulas.join(" ")})`}),
+                formulas,
+            }),
+        });
+
+    return {
+        operator,
+        associativity: "left",
+        infixParser: OperatorParser("||").map(() => operator),
+    };
+});

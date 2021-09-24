@@ -21,9 +21,9 @@ export function createFormula<T extends IFormulaInput>(
 
     const completeFormula: IFormula & T["data"] = {
         ...formula.data,
-        precedence: 0,
+        precedence: formula.precedence,
         execute: (context = new Context()) => formula.execute(context),
-        format: (context = new Context()) => formula.format(format(context), context),
+        format: (context = new Context()) => formula.format(context),
         toCNF: (context = new Context()) => formula.toCNF(context),
         solve: solver => (solver || CDCLSolver)(completeFormula),
         toSMTLIB2: (context = new Context()) => formula.toSMTLIB2(context),
