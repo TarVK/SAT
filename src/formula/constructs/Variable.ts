@@ -55,13 +55,15 @@ export const VariableFactory = createOperatorFactory(({precedence}) => {
     let inputText = "";
     return {
         operator,
-        parser: P.seq(P.regex(/\w+/), MetaDataParser).map(([variable, {input}]) => {
-            if (input != inputText) cache.clear();
-            inputText = input;
+        parser: P.seq(P.regex(/\w+/).desc("Variable"), MetaDataParser).map(
+            ([variable, {input}]) => {
+                if (input != inputText) cache.clear();
+                inputText = input;
 
-            // TODO: find an alternative that supports other variable types in the future
-            if (!cache.has(variable)) cache.set(variable, operator(variable, Bool));
-            return cache.get(variable)!;
-        }),
+                // TODO: find an alternative that supports other variable types in the future
+                if (!cache.has(variable)) cache.set(variable, operator(variable, Bool));
+                return cache.get(variable)!;
+            }
+        ),
     };
 });

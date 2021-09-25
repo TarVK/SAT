@@ -1,13 +1,28 @@
-import {Context} from "./context/Context";
-import {Bool} from "./formula/types/Bool";
-import {VarCollection} from "./formula/varCollection";
-import {CDCLSolver} from "./solver/procedures/CDCL/CDCLSolver";
-import {DPLLSolver} from "./solver/procedures/DPLLSolver";
-import {getPartialPigeonHoleFormula} from "./solver/procedures/_tests/formulas.helper";
-import {genList} from "./utils/genList";
-import {IVariableCollection} from "./_types/solver/IVariableCollection";
-import {And, Not, Or, parse, Variable} from "./formula/defaultLanguage";
-import {IFormula} from "./_types/IFormula";
+export * from "./_types";
+export * from "./solver/procedures";
+export * from "./formula/defaultLanguage";
+
+// import {Context} from "./context/Context";
+// import {Bool} from "./formula/types/Bool";
+// import {VarCollection} from "./formula/varCollection";
+// import {CDCLSolver} from "./solver/procedures/CDCL/CDCLSolver";
+// import {DPLLSolver} from "./solver/procedures/DPLLSolver";
+// import {getPartialPigeonHoleFormula} from "./solver/procedures/_tests/formulas.helper";
+// import {genList} from "./utils/genList";
+// import {IVariableCollection} from "./_types/solver/IVariableCollection";
+// import {And, Not, Or, parse, Variable} from "./formula/defaultLanguage";
+// import {IFormula} from "./_types/IFormula";
+
+// const result = parse("((a && b) || !(b || c)) && (!c && b)");
+// if (result.status) {
+//     const formula = result.value;
+//     console.log(formula.format());
+
+//     formula.solve().then(solution => {
+//         if (solution) logResult(formula, solution);
+//         else console.log("unsatisfiable");
+//     });
+// } else console.log(result);
 
 // const a = Variable("a", Bool);
 // const b = Variable("b", Bool);
@@ -19,24 +34,14 @@ import {IFormula} from "./_types/IFormula";
 // // const formula = Implies(a, b);
 
 // formula.solve().then(console.log);
-const result = parse("((a && b) || !(b || c)) && (!c && b && !a)");
-if (result.status) {
-    const formula = result.value;
-    console.log(formula.format());
 
-    formula.solve().then(solution => {
-        if (solution) logResult(formula, solution);
-        else console.log("unsatisfiable");
-    });
-} else console.log(result);
-
-function logResult(formula: IFormula, solution: IVariableCollection) {
-    const result = [...formula.toSMTLIB2().variables].map(v => ({
-        var: v.name,
-        val: solution.get(v),
-    }));
-    console.log(result);
-}
+// function logResult(formula: IFormula, solution: IVariableCollection) {
+//     const result = [...formula.toSMTLIB2().variables].map(v => ({
+//         var: v.name,
+//         val: solution.get(v),
+//     }));
+//     console.log(result);
+// }
 
 // const formula = getPartialPigeonHoleFormula(8);
 

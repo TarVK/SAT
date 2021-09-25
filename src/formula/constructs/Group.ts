@@ -30,7 +30,7 @@ export const GroupFactory = createOperatorFactory(({precedence, nextParser}) => 
 
     return {
         operator,
-        parser: P.seq(P.string("("), nextParser, P.string(")")).map(
+        parser: P.seq(P.string("("), nextParser.trim(P.optWhitespace), P.string(")")).map(
             ([l, formula, r]) => formula
         ),
     };

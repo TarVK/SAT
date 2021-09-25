@@ -97,8 +97,10 @@ export function createLanguage<O extends IOperatorFactory[][]>(
         {parser: P.lazy(() => result.parser), operators: [] as IOperator[][]}
     );
 
+    const parser = result.parser.trim(P.optWhitespace);
+
     return {
-        parse: (...args) => result.parser.parse(...args),
+        parse: (...args) => parser.parse(...args),
         operators: result.operators as any,
     };
 }
