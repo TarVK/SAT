@@ -14,7 +14,7 @@ import {useAnnotationRemover} from "./util/useAnnotationsRemover";
 const theme = getTheme();
 export const App: FC = () => {
     const [editor, editorRef] = useEditor({
-        value: "(\n    !a || a\n)",
+        value: "(!a || a) => (b <=> c)",
         height: "100%",
         options: {
             minimap: {enabled: false},
