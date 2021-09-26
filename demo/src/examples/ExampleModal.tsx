@@ -15,7 +15,7 @@ import {pigeonHole} from "./types/pigeonHole";
 const examples = [binaryAddition, pigeonHole];
 const theme = getTheme();
 export const ExampleModal: FC<{onLoad: (example: string) => void}> = ({onLoad}) => {
-    const [visible, setVisible] = useState(true);
+    const [visible, setVisible] = useState(false);
     const getCode = useRef(() => "");
 
     return (
