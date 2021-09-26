@@ -5,22 +5,35 @@ Me messing around with SAT stuff, applying some common satisfiability checking t
 This project will most likely not end up being something I publish as a package, as it probably won't be useful.
 But in the end I may make some web tool to play around with this thing.
 
-## Current state
+## Demo
 
-Currently boolean formula constructs are implemented
+[Check out the demo here](https://tarvk.github.io/SAT/demo/build/)
 
--   `Variable`: Creates a boolean variable of the given type (currently only Boolean is supported)
--   `Not`: Negates a boolean formula
--   `And`: Takes the conjunction of 2 or more boolean formulas
--   `Or`: Takes the disjunction of 2 or more boolean formulas
--   `Implies`: Takes a premise and conclusion formula, and ensures the conclusion holds if the premise holds
--   `BiImplies`: Checks whether two given formulas result in the same value
+I've created a demo webpage in order to play with the tool using the built-in parser, which allows you to compare the performance of the 3 different solvers.
+It features some built-in examples in order to get an idea for the things SAT-solvers can be used for.
 
-Created variable are unique, even if they use the same name, so they should be defined upfront. Below is an example of a formula:
+## Functionality
+
+Currently boolean formula constructs are implemented, with related syntax
+
+-   `Variable`, `varName`: Creates a boolean variable of the given type (currently only Boolean is supported)
+-   `Not`, `![a]`: Negates a boolean formula
+-   `And`, `[a] && [b]`: Takes the conjunction of 2 or more boolean formulas
+-   `Or`, `[a] || [b]`: Takes the disjunction of 2 or more boolean formulas
+-   `Implies`, `[a] => [b]`: Takes a premise and conclusion formula, and ensures the conclusion holds if the premise holds
+-   `BiImplies`, `[a] <=> [b]`: Checks whether two given formulas result in the same value
+
+Created variables are unique, even if they use the same name, so they should be defined upfront. Below is an example of a formula in javascript:
 
 ```ts
 const a = Variable("a", Bool);
 const formula = And(a, Not(a));
+```
+
+We can also creates formulas using the parser:
+
+```ts
+const formula = parse(`a && !a`);
 ```
 
 The formula can then be attempted to be solved using `solve`:
@@ -60,7 +73,9 @@ If no solver is specified, CDCL is used.
 
 ### Correctness
 
-IT's not unlikely that there are mistakes in some of this code (somewhat defeating the purpose),
+It's not unlikely that there are mistakes in some of this code (somewhat defeating the purpose),
 but I've at least confirmed it behaves correctly on a couple of formulae in the form of unit tests:
 
 https://github.com/TarVK/SAT/tree/main/src/solver/procedures/_tests
+
+It's also relatively likely that DavisPutnam generates incorrect solutions in some cases - or even throws errors - since the algorithm to obtain the solution after satisfiability is proven, has been improvised due to a lack of sources.
