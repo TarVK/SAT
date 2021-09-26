@@ -4,12 +4,12 @@ import {ICNF} from "../../_types/solver/ICNF";
 import {ISolveResult} from "../../_types/solver/ISolveResult";
 import {applyResolution} from "../applyResolution";
 import {ICNFLiteral} from "../../_types/solver/ICNF";
+import {IVariableIdentifier} from "../../_types/solver/IVariableIdentifier";
 import {
     clauseIsTautology,
     removeDuplicateVars,
     simplifyCNFRepresentation,
 } from "../simplifyCNFRepresentation";
-import {IVariableIdentifier} from "../..";
 
 /**
  * Solves the satisfiability problem using Davis Putnam's procedure
@@ -32,8 +32,10 @@ export async function DavisPutnamSolver(formula: IFormula | ICNF): Promise<ISolv
 
     // Apply resolution until the empty clause is found, or no clauses remain
     const steps = [remainingClauses];
+    const varSteps: IVariableIdentifier<boolean>[] = [];
     while (remainingClauses.length > 0) {
         const target = remainingClauses[0][0].variable;
+        varSteps.push(target);
 
         // Find clauses with this variable
         const clausesContainingVarOrNegatedVar = remainingClauses.filter(clause =>
@@ -69,29 +71,62 @@ export async function DavisPutnamSolver(formula: IFormula | ICNF): Promise<ISolv
     }
 
     // If no clauses remain, we have a conjunction over no items, which is a tautology
-    // Go back through the steps to find the solution by applying unit resolution with the known variables on every clause
-    const vars = new Map<IVariableIdentifier<boolean>, boolean>();
-    const reverseSteps = [...steps].reverse();
-    for (let formula of reverseSteps) {
-        clause: for (let clause of formula) {
-            let openLiteral: ICNFLiteral | undefined;
-            for (let literal of clause) {
-                if (vars.has(literal.variable)) {
-                    // If the assignment satisfies the clause, we can't conclude anything
-                    if (vars.get(literal.variable) == !literal.negated) continue clause;
-                } else {
-                    // If the clause has multiple open literals, we can't conclude anything
-                    if (openLiteral) continue clause;
-                    openLiteral = literal;
-                }
-            }
 
-            if (!openLiteral)
+    // Go back through the steps to find the solution by applying unit resolution with the known variables on every clause (this algorithm is quite improvised, and may not be sound)
+    const vars = new Map<IVariableIdentifier<boolean>, boolean>();
+    for (let i = steps.length - 2; i >= 0; i--) {
+        const formula = steps[i];
+        const stepVar = varSteps[i];
+
+        let validStepDecisionClause: ICNFLiteral[] | undefined;
+        const resolve = () => {
+            clause: for (let clause of formula) {
+                let multipleOpen = false;
+                let containsStep = false;
+                let openLiteral: ICNFLiteral | undefined;
+                for (let literal of clause) {
+                    if (literal.variable == stepVar) containsStep = true;
+
+                    if (vars.has(literal.variable)) {
+                        // If the assignment satisfies the clause, we can't conclude anything
+                        if (vars.get(literal.variable) == !literal.negated)
+                            continue clause;
+                    } else {
+                        if (openLiteral) multipleOpen = true;
+                        openLiteral = literal;
+                    }
+                }
+
+                // If the clause has multiple open literals, we can't conclude anything
+                if (multipleOpen) {
+                    if (containsStep) validStepDecisionClause = clause;
+                    continue;
+                }
+
+                if (!openLiteral)
+                    throw Error(
+                        "Reached a contradiction despite proving satisfiable, this shouldn't be reachable. 2"
+                    );
+
+                console.log(openLiteral.variable.name, !openLiteral.negated);
+                vars.set(openLiteral.variable, !openLiteral.negated);
+            }
+        };
+        resolve();
+
+        // Sometimes the variable could've gone either way, in which case we need to just assign a value
+        if (!vars.has(stepVar)) {
+            if (!validStepDecisionClause)
                 throw Error(
-                    "Reached a contradiction despite proving satisfiable, this shouldn't be reachable."
+                    "Reached a contradiction despite proving satisfiable, this shouldn't be reachable. 1"
                 );
 
-            vars.set(openLiteral.variable, !openLiteral.negated);
+            vars.set(
+                stepVar,
+                !validStepDecisionClause.find(({variable}) => variable == stepVar)
+                    ?.negated
+            );
+            resolve();
         }
     }
 

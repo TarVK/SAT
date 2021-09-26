@@ -14,7 +14,7 @@ import {ExampleModal} from "./examples/ExampleModal";
 const theme = getTheme();
 export const App: FC = () => {
     const [editor, editorRef] = useEditor({
-        value: "(!a || a) => (a <=> b <=> c)",
+        value: "(!a || a) => ((a <=> b) && (b <=> c))",
         height: "100%",
         options: {
             minimap: {enabled: false},
