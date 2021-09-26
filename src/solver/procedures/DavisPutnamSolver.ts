@@ -3,11 +3,13 @@ import {IFormula} from "../../_types/IFormula";
 import {ICNF} from "../../_types/solver/ICNF";
 import {ISolveResult} from "../../_types/solver/ISolveResult";
 import {applyResolution} from "../applyResolution";
+import {ICNFLiteral} from "../../_types/solver/ICNF";
 import {
     clauseIsTautology,
     removeDuplicateVars,
     simplifyCNFRepresentation,
 } from "../simplifyCNFRepresentation";
+import {IVariableIdentifier} from "../..";
 
 /**
  * Solves the satisfiability problem using Davis Putnam's procedure
@@ -29,6 +31,7 @@ export async function DavisPutnamSolver(formula: IFormula | ICNF): Promise<ISolv
     if (containsEmpty) return undefined;
 
     // Apply resolution until the empty clause is found, or no clauses remain
+    const steps = [remainingClauses];
     while (remainingClauses.length > 0) {
         const target = remainingClauses[0][0].variable;
 
@@ -62,9 +65,37 @@ export async function DavisPutnamSolver(formula: IFormula | ICNF): Promise<ISolv
         remainingClauses = remainingClauses.filter(clause =>
             clause.every(({variable}) => variable != target)
         );
+        steps.push(remainingClauses);
     }
 
     // If no clauses remain, we have a conjunction over no items, which is a tautology
-    // TODO: compute the actual variables
-    return new VarCollection();
+    // Go back through the steps to find the solution by applying unit resolution with the known variables on every clause
+    const vars = new Map<IVariableIdentifier<boolean>, boolean>();
+    const reverseSteps = [...steps].reverse();
+    for (let formula of reverseSteps) {
+        clause: for (let clause of formula) {
+            let openLiteral: ICNFLiteral | undefined;
+            for (let literal of clause) {
+                if (vars.has(literal.variable)) {
+                    // If the assignment satisfies the clause, we can't conclude anything
+                    if (vars.get(literal.variable) == !literal.negated) continue clause;
+                } else {
+                    // If the clause has multiple open literals, we can't conclude anything
+                    if (openLiteral) continue clause;
+                    openLiteral = literal;
+                }
+            }
+
+            if (!openLiteral)
+                throw Error(
+                    "Reached a contradiction despite proving satisfiable, this shouldn't be reachable."
+                );
+
+            vars.set(openLiteral.variable, !openLiteral.negated);
+        }
+    }
+
+    const collection = new VarCollection();
+    vars.forEach((value, key) => collection.set(key, value));
+    return collection;
 }
