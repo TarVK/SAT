@@ -2,7 +2,7 @@ import {Stack, StackItem, getTheme, Link, CommandBarButton} from "office-ui-fabr
 import React, {FC} from "react";
 
 const theme = getTheme();
-export const Header: FC = () => (
+export const Header: FC = ({children}) => (
     <Stack
         horizontal
         horizontalAlign="space-between"
@@ -18,6 +18,7 @@ export const Header: FC = () => (
         <StackItem align="center">
             <h1 style={{margin: 0}}>SAT-solver</h1>
         </StackItem>
+        <StackItem align="center">{children}</StackItem>
         <StackItem align="center">
             <Link href="https://github.com/TarVK/SAT">
                 <CommandBarButton styles={{root: {padding: theme.spacing.l1}}}>

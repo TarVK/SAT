@@ -10,6 +10,7 @@ import {combineOptions} from "./util/combineOptions";
 import {getResultVariables} from "./util/getResultVariables";
 import "./errorStyling.css";
 import {useAnnotationRemover} from "./util/useAnnotationsRemover";
+import {ExampleModal} from "./examples/ExampleModal";
 
 const theme = getTheme();
 export const App: FC = () => {
@@ -57,6 +58,11 @@ export const App: FC = () => {
 
     useEffect(() => {
         const editor = editorRef.current;
+
+        // Resize the editor on changes (sidebar may have changed size)
+        if (editor) editor.layout();
+
+        // Highlight syntax errors in the editor
         if (result && "error" in result && editor) {
             const index = result.error.index;
             const text = editor.getValue();
@@ -106,9 +112,15 @@ export const App: FC = () => {
         <div>
             <Stack styles={{root: {height: "100%", overflow: "hidden"}}}>
                 <StackItem>
-                    <Header />
+                    <Header>
+                        <ExampleModal
+                            onLoad={value => {
+                                editorRef.current?.setValue(value);
+                            }}
+                        />
+                    </Header>
                 </StackItem>
-                <StackItem grow={1}>
+                <StackItem grow={1} style={{minHeight: 0}}>
                     <Stack horizontal styles={{root: {height: "100%"}}}>
                         <StackItem
                             align="stretch"

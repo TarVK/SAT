@@ -26,13 +26,13 @@
     "dependencies": {
         "@fluentui/react": "^7.153.4",
         "@monaco-editor/react": "^4.2.2",
-        "SAT": "link:../",
+        "SAT": "link:..",
         "color": "^3.1.3",
-        "fuzzy-rater": "link:..",
         "monaco-editor": "^0.28.1",
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
-        "react-json-view": "^1.19.1"
+        "react-json-view": "^1.19.1",
+        "react-tex": "^1.5.0"
     },
     "devDependencies": {
         "@types/color": "^3.0.1",

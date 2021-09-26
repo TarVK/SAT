@@ -15,71 +15,80 @@ export const Sidebar: FC<{
 
     const evaluationTime = result && formatTime(result.duration);
     return (
-        <Fragment>
-            <Dropdown
-                placeholder="Select an option"
-                label="Solver"
-                options={[
-                    {
-                        key: "0",
-                        data: 0,
-                        text: "DavisPutnam",
-                        selected: solverId == 0,
-                    },
-                    {
-                        key: "1",
-                        data: 1,
-                        text: "DPLL",
-                        selected: solverId == 1,
-                    },
-                    {
-                        key: "2",
-                        data: 2,
-                        text: "CDCL",
-                        selected: solverId == 2,
-                    },
-                ]}
-                onChange={(e, option) => option && setSolverId(option.data)}
-            />
-            <PrimaryButton
-                text="Solve"
-                onClick={() => onSolve(solvers[solverId])}
-                allowDisabledFocus
-                styles={{
-                    root: {
-                        width: "100%",
-                        marginTop: theme.spacing.m,
-                        marginBottom: theme.spacing.m,
-                    },
-                }}
-            />
+        <Stack style={{maxHeight: "100%"}}>
+            <StackItem>
+                <Dropdown
+                    placeholder="Select an option"
+                    label="Solver"
+                    options={[
+                        {
+                            key: "0",
+                            data: 0,
+                            text: "DavisPutnam",
+                            selected: solverId == 0,
+                        },
+                        {
+                            key: "1",
+                            data: 1,
+                            text: "DPLL",
+                            selected: solverId == 1,
+                        },
+                        {
+                            key: "2",
+                            data: 2,
+                            text: "CDCL",
+                            selected: solverId == 2,
+                        },
+                    ]}
+                    onChange={(e, option) => option && setSolverId(option.data)}
+                />
+            </StackItem>
+            <StackItem>
+                <PrimaryButton
+                    text="Solve"
+                    onClick={() => onSolve(solvers[solverId])}
+                    allowDisabledFocus
+                    styles={{
+                        root: {
+                            width: "100%",
+                            marginTop: theme.spacing.m,
+                            marginBottom: theme.spacing.m,
+                        },
+                    }}
+                />
+            </StackItem>
             {result && (
                 <Fragment>
-                    {"solution" in result ? (
-                        <ReactJson
-                            src={result.solution}
-                            name={"solution"}
-                            displayDataTypes={false}
-                            quotesOnKeys={false}
-                            displayObjectSize={false}
-                        />
-                    ) : "error" in result ? (
-                        <div style={{color: "rgb(175 20 20)"}}>
-                            {result.error.message}
-                        </div>
-                    ) : (
-                        "Formula is not satisfiable"
-                    )}
+                    <StackItem shrink={1} style={{minHeight: 0, overflow: "auto"}}>
+                        {"solution" in result ? (
+                            <ReactJson
+                                src={result.solution}
+                                name={"solution"}
+                                displayDataTypes={false}
+                                quotesOnKeys={false}
+                                displayObjectSize={false}
+                                sortKeys={true}
+                            />
+                        ) : "error" in result ? (
+                            <div style={{color: "rgb(175 20 20)"}}>
+                                {result.error.message}
+                            </div>
+                        ) : (
+                            "Formula is not satisfiable"
+                        )}
+                    </StackItem>
 
-                    <div style={{marginTop: theme.spacing.m}}>
-                        Evaluated in{" "}
-                        <span style={{color: theme.palette.accent}}>
-                            {evaluationTime!.value}
-                        </span>
-                        {evaluationTime!.unit}
-                    </div>
+                    <StackItem>
+                        <div style={{marginTop: theme.spacing.m}}>
+                            Evaluated in{" "}
+                            <span style={{color: theme.palette.accent}}>
+                                {evaluationTime!.value}
+                            </span>
+                            {evaluationTime!.unit}
+                        </div>
+                    </StackItem>
                 </Fragment>
             )}
-        </Fragment>
+        </Stack>
     );
 };

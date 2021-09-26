@@ -50,7 +50,7 @@ editor.defineTheme(SATTheme, {
     rules: [
         {token: "bracket", foreground: "000000"},
         {token: "operator", foreground: "2299cc", fontStyle: "bold"},
-        {token: "variable", foreground: "1a1c31"},
+        {token: "variable", foreground: "2a2c61"},
     ],
     colors: {},
 });
