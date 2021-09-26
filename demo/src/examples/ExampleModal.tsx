@@ -40,6 +40,7 @@ export const ExampleModal: FC<{onLoad: (example: string) => void}> = ({onLoad}) 
                                 itemContainer: {
                                     maxHeight: "calc(100vh - 150px)",
                                     overflow: "auto",
+                                    fontSize: 13,
                                 },
                             }}>
                             {examples.map(({name, Comp}, i) => (

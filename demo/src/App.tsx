@@ -1,5 +1,5 @@
 import {Range, editor as Editor} from "monaco-editor";
-import React, {FC, useCallback, useEffect, useRef, useState} from "react";
+import React, {FC, Suspense, useCallback, useEffect, useRef, useState} from "react";
 import {useEditor} from "./useEditor";
 import {Stack, StackItem, getTheme, Dropdown, PrimaryButton} from "@fluentui/react";
 import {Header} from "./Header";
@@ -8,7 +8,6 @@ import {ISATSolver, parse} from "SAT";
 import {ISolveResult} from "./_types/ISolveResult";
 import {combineOptions} from "./util/combineOptions";
 import {getResultVariables} from "./util/getResultVariables";
-import "./errorStyling.css";
 import {useAnnotationRemover} from "./util/useAnnotationsRemover";
 import {ExampleModal} from "./examples/ExampleModal";
 
