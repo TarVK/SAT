@@ -77,7 +77,7 @@ export const binaryAddition = {
                 <br />
                 <br />
                 <img
-                    src="/addition.png"
+                    src="addition.png"
                     style={{maxWidth: 300, maxHeight: 100, float: "right"}}
                 />
                 <InlineTex
