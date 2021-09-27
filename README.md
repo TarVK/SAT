@@ -1,9 +1,8 @@
 # SAT
 
-Me messing around with SAT stuff, applying some common satisfiability checking techniques myself.
-
-This project will most likely not end up being something I publish as a package, as it probably won't be useful.
-But in the end I may make some web tool to play around with this thing.
+During one of my courses SMT-solvers were discussed in quite some detail, so I wanted to apply that theory in practice myself.
+Currently this is only a SAT solver, but I may try to extend the functionality in the future.
+This isn't published as a package anywhere, since there are way better SMT-solvers such as [Z3](https://github.com/Z3Prover/z3) already out there to be used in practice. 
 
 ## Demo
 
