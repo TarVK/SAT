@@ -1,9 +1,12 @@
 # SAT
 
-Me messing around with SAT stuff, applying some common satisfiability checking techniques myself.
+During one of my courses SMT-solvers were discussed in quite some detail, so I wanted to apply that theory in practice myself.
+Currently this is only a SAT solver, but I may try to extend the functionality in the future.
+This isn't published as a package anywhere, since there are way better SMT-solvers such as [Z3](https://github.com/Z3Prover/z3) already out there to be used in practice. 
 
-This project will most likely not end up being something I publish as a package, as it probably won't be useful.
-But in the end I may make some web tool to play around with this thing.
+The most interesting parts of the source code are:
+- The [CDCL solver implementation](https://github.com/TarVK/SAT/blob/main/src/solver/procedures/CDCL/CDCLSolver.ts) which can efficiently solve many formulas
+- The [language constructs](https://github.com/TarVK/SAT/tree/main/src/formula/constructs) and how they are combined into a [default language](https://github.com/TarVK/SAT/blob/main/src/formula/defaultLanguage.ts) with specific precedences. 
 
 ## Demo
 
