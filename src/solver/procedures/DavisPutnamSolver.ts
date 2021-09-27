@@ -108,7 +108,6 @@ export async function DavisPutnamSolver(formula: IFormula | ICNF): Promise<ISolv
                         "Reached a contradiction despite proving satisfiable, this shouldn't be reachable. 2"
                     );
 
-                console.log(openLiteral.variable.name, !openLiteral.negated);
                 vars.set(openLiteral.variable, !openLiteral.negated);
             }
         };
